@@ -106,3 +106,6 @@ mv build/opt_lib.ll outputs/opt_lib_non_pgo.ll
 
 perf stat ./build/non_pgo 2>&1 | tee outputs/non_pgo.stats
 perf stat ./build/pgo_use 2>&1 | tee outputs/pgo_use.stats
+
+hyperfine --warmup 5 ./build/non_pgo
+hyperfine --warmup 5 ./build/pgo_use
