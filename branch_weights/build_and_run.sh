@@ -1,6 +1,13 @@
 #!/bin/sh
 
 CWD=$(pwd)
+COMMON_ARGS="--emit=llvm-ir,link,obj \
+             -C opt-level=3 \
+             -L ./build \
+             -C codegen-units=1 \
+             --out-dir=./build \
+             -Clinker=clang-8 \
+             -Clink-args=-fuse-ld=lld"
 
 rm -rf $CWD/profdata
 rm -rf $CWD/build
@@ -11,19 +18,25 @@ mkdir -p $CWD/build
 rustup override set 0-rust-2
 
 rustc --emit=llvm-ir,link \
-      --crate-type=rlib \
       -C opt-level=3 \
       --out-dir ./build \
+      -C codegen-units=1 \
       opaque.rs
 
-rustc --emit=llvm-ir,link \
+
+#--------------------------------
+# Build the instrumented binary
+#--------------------------------
+rustc $COMMON_ARGS \
       -C profile-generate=$CWD/profdata \
-      -C opt-level=3 \
-      -L ./build \
+      opt_lib.rs
+
+rustc $COMMON_ARGS \
+      -C profile-generate=$CWD/profdata \
       --crate-name=pgo_gen \
-      --crate-type=bin \
-      --out-dir ./build \
       branch_weights.rs
+
+mv build/opt_lib.ll build/opt_lib_gen.ll
 
 ./build/pgo_gen > /dev/null
 ./build/pgo_gen > /dev/null
@@ -38,19 +51,17 @@ rustc --emit=llvm-ir,link \
 
 llvm-profdata merge -o ./profdata/merged.profdata ./profdata
 
-rustc --emit=llvm-ir,link \
+rustc $COMMON_ARGS \
       -C profile-use=$CWD/profdata/merged.profdata \
-      -C opt-level=3 \
-      -L ./build \
-      --crate-type=bin \
+      opt_lib.rs
+
+rustc $COMMON_ARGS \
+      -C profile-use=$CWD/profdata/merged.profdata \
       --crate-name=pgo_use \
-      --out-dir ./build \
       branch_weights.rs
 
-rustc --emit=llvm-ir,link \
-      -C opt-level=3 \
-      -L ./build \
-      --crate-type=bin \
+mv build/opt_lib.ll build/opt_lib_use.ll
+
+rustc $COMMON_ARGS \
       --crate-name=non_pgo \
-      --out-dir ./build \
       branch_weights.rs

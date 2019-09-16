@@ -1,5 +1,5 @@
 
-
+#![crate_type="rlib"]
 
 pub fn opaque1(_: u8) {
 
