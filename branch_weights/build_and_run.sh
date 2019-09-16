@@ -65,3 +65,7 @@ mv build/opt_lib.ll build/opt_lib_use.ll
 rustc $COMMON_ARGS \
       --crate-name=non_pgo \
       branch_weights.rs
+
+
+perf stat ./build/non_pgo
+perf stat ./build/pgo_use
