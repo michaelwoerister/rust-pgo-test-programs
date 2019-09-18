@@ -9,10 +9,10 @@ pub fn do_the_loop(buffer: &[u8], len: usize) {
     let mut i = 0;
 
     while i < len {
-        // This is the less common case in the input
         let val = buffer[i];
 
         if val < 20 {
+            // This is the less common case in the input, hit ~20% of the time
             opaque::opaque1(val);
         } else {
             opaque::opaque2(val);
