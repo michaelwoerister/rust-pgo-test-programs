@@ -1,13 +1,16 @@
 #!/bin/sh
 
 CWD=$(pwd)
+
+LINKER=lld
+
 COMMON_ARGS="--emit=llvm-ir,link \
              -C opt-level=3 \
              -L ./build \
              -C codegen-units=1 \
              --out-dir=./build \
              -Clinker=clang-8 \
-             -Clink-args=-fuse-ld=lld"
+             -Clink-args=-fuse-ld=$LINKER"
 
 rm -rf ./profdata
 rm -rf ./build
@@ -36,7 +39,7 @@ rustc $COMMON_ARGS \
       --crate-name=pgo_gen \
       branch_weights.rs
 
-mv build/opt_lib.ll outputs/opt_lib_gen.ll
+mv build/opt_lib.ll outputs/opt_lib_gen.$LINKER.ll
 
 
 
@@ -79,7 +82,7 @@ rustc $COMMON_ARGS \
       --crate-name=pgo_use \
       branch_weights.rs
 
-mv build/opt_lib.ll outputs/opt_lib_use.ll
+mv build/opt_lib.ll outputs/opt_lib_use.$LINKER.ll
 
 
 #--------------------------------
@@ -102,10 +105,10 @@ rustc $COMMON_ARGS \
       --crate-name=non_pgo \
       branch_weights.rs
 
-mv build/opt_lib.ll outputs/opt_lib_non_pgo.ll
+mv build/opt_lib.ll outputs/opt_lib_non_pgo.$LINKER.ll
 
-perf stat ./build/non_pgo 2>&1 | tee outputs/non_pgo.stats
-perf stat ./build/pgo_use 2>&1 | tee outputs/pgo_use.stats
+perf stat ./build/non_pgo 2>&1 | tee outputs/non_pgo.$LINKER.stats
+perf stat ./build/pgo_use 2>&1 | tee outputs/pgo_use.$LINKER.stats
 
 hyperfine --warmup 5 ./build/non_pgo
 hyperfine --warmup 5 ./build/pgo_use
