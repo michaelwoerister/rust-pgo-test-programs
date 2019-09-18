@@ -1,18 +1,18 @@
 
  Performance counter stats for './build/pgo_use':
 
-            159.13 msec task-clock                #    0.997 CPUs utilized          
+            154.14 msec task-clock                #    0.997 CPUs utilized          
                  0      context-switches          #    0.000 K/sec                  
                  0      cpu-migrations            #    0.000 K/sec                  
-                47      page-faults               #    0.295 K/sec                  
-       595,780,561      cycles                    #    3.744 GHz                    
-     1,061,859,092      instructions              #    1.78  insn per cycle         
-       400,738,607      branches                  # 2518.327 M/sec                  
-         2,393,822      branch-misses             #    0.60% of all branches        
+                48      page-faults               #    0.311 K/sec                  
+       593,400,267      cycles                    #    3.850 GHz                    
+     1,061,821,908      instructions              #    1.79  insn per cycle         
+       400,731,302      branches                  # 2599.777 M/sec                  
+         2,384,995      branch-misses             #    0.60% of all branches        
 
-       0.159645076 seconds time elapsed
+       0.154628273 seconds time elapsed
 
-       0.158438000 seconds user
-       0.000987000 seconds sys
+       0.154480000 seconds user
+       0.000000000 seconds sys
 
 
