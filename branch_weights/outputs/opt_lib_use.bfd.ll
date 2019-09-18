@@ -16,7 +16,7 @@ start:
 bb2:                                              ; preds = %start, %bb9
   %i.08 = phi i64 [ %8, %bb9 ], [ 0, %start ]
   %3 = icmp ult i64 %i.08, %1
-  br i1 %3, label %bb4, label %panic, !prof !1
+  br i1 %3, label %bb4, label %panic, !prof !28
 
 bb3:                                              ; preds = %bb9, %start
   ret void
@@ -63,7 +63,34 @@ declare i16 @_ZN6opaque7opaque217haa47a1a064db8b6aE(i8) unnamed_addr #0
 attributes #0 = { nonlazybind uwtable "probe-stack"="__rust_probestack" "target-cpu"="x86-64" }
 attributes #1 = { cold noinline noreturn nonlazybind uwtable "probe-stack"="__rust_probestack" "target-cpu"="x86-64" }
 
-!llvm.module.flags = !{!0}
+!llvm.module.flags = !{!0, !1}
 
 !0 = !{i32 2, !"RtLibUseGOT", i32 1}
-!1 = !{!"branch_weights", i32 2000, i32 1}
+!1 = !{i32 1, !"ProfileSummary", !2}
+!2 = !{!3, !4, !5, !6, !7, !8, !9, !10}
+!3 = !{!"ProfileFormat", !"InstrProf"}
+!4 = !{!"TotalCount", i64 1000030}
+!5 = !{!"MaxCount", i64 1000000}
+!6 = !{!"MaxInternalCount", i64 10}
+!7 = !{!"MaxFunctionCount", i64 1000000}
+!8 = !{!"NumCounts", i64 7}
+!9 = !{!"NumFunctions", i64 6}
+!10 = !{!"DetailedSummary", !11}
+!11 = !{!12, !13, !14, !15, !16, !17, !18, !19, !20, !21, !22, !23, !24, !25, !26, !27}
+!12 = !{i32 10000, i64 1000000, i32 1}
+!13 = !{i32 100000, i64 1000000, i32 1}
+!14 = !{i32 200000, i64 1000000, i32 1}
+!15 = !{i32 300000, i64 1000000, i32 1}
+!16 = !{i32 400000, i64 1000000, i32 1}
+!17 = !{i32 500000, i64 1000000, i32 1}
+!18 = !{i32 600000, i64 1000000, i32 1}
+!19 = !{i32 700000, i64 1000000, i32 1}
+!20 = !{i32 800000, i64 1000000, i32 1}
+!21 = !{i32 900000, i64 1000000, i32 1}
+!22 = !{i32 950000, i64 1000000, i32 1}
+!23 = !{i32 990000, i64 1000000, i32 1}
+!24 = !{i32 999000, i64 1000000, i32 1}
+!25 = !{i32 999900, i64 1000000, i32 1}
+!26 = !{i32 999990, i64 10, i32 4}
+!27 = !{i32 999999, i64 10, i32 4}
+!28 = !{!"branch_weights", i32 2000, i32 1}

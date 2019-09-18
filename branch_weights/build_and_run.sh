@@ -2,7 +2,7 @@
 
 CWD=$(pwd)
 
-LINKER=lld
+LINKER=bfd
 
 COMMON_ARGS="--emit=llvm-ir,link \
              -C opt-level=3 \
@@ -36,26 +36,26 @@ rustc $COMMON_ARGS \
 
 rustc $COMMON_ARGS \
       -C profile-generate=$CWD/profdata \
-      --crate-name=pgo_gen \
       branch_weights.rs
 
 mv build/opt_lib.ll outputs/opt_lib_gen.$LINKER.ll
-
+mv build/branch_weights.ll outputs/pgo_gen.$LINKER.ll
+mv build/branch_weights outputs/pgo_gen.$LINKER
 
 
 #--------------------------------
 # Collect profile
 #--------------------------------
-./build/pgo_gen > /dev/null
-./build/pgo_gen > /dev/null
-./build/pgo_gen > /dev/null
-./build/pgo_gen > /dev/null
-./build/pgo_gen > /dev/null
-./build/pgo_gen > /dev/null
-./build/pgo_gen > /dev/null
-./build/pgo_gen > /dev/null
-./build/pgo_gen > /dev/null
-./build/pgo_gen > /dev/null
+./outputs/pgo_gen.$LINKER > /dev/null
+./outputs/pgo_gen.$LINKER > /dev/null
+./outputs/pgo_gen.$LINKER > /dev/null
+./outputs/pgo_gen.$LINKER > /dev/null
+./outputs/pgo_gen.$LINKER > /dev/null
+./outputs/pgo_gen.$LINKER > /dev/null
+./outputs/pgo_gen.$LINKER > /dev/null
+./outputs/pgo_gen.$LINKER > /dev/null
+./outputs/pgo_gen.$LINKER > /dev/null
+./outputs/pgo_gen.$LINKER > /dev/null
 
 llvm-profdata merge -o ./profdata/merged.profdata ./profdata
 
@@ -71,19 +71,29 @@ rustc --emit=llvm-ir,link \
       -C opt-level=3 \
       --out-dir ./build \
       -C codegen-units=1 \
+      -C llvm-args="-pgo-warn-missing-function" \
       opaque.rs
 
 rustc $COMMON_ARGS \
       -C profile-use=$CWD/profdata/merged.profdata \
+      -C llvm-args="-pgo-warn-missing-function" \
       opt_lib.rs
 
 rustc $COMMON_ARGS \
       -C profile-use=$CWD/profdata/merged.profdata \
-      --crate-name=pgo_use \
+      -C llvm-args="-pgo-warn-missing-function" \
       branch_weights.rs
 
-mv build/opt_lib.ll outputs/opt_lib_use.$LINKER.ll
+# cd build
+# llvm-dis pgo_use.pgo_use.7rcbfp3g-cgu.0.rcgu.bc
+# llvm-dis pgo_use.pgo_use.7rcbfp3g-cgu.0.rcgu.no-opt.bc
+# mv pgo_use.pgo_use.7rcbfp3g-cgu.0.rcgu.ll ../opt.ll
+# mv pgo_use.pgo_use.7rcbfp3g-cgu.0.rcgu.no-opt.ll ../no-opt.ll
+# cd ..
 
+mv build/opt_lib.ll outputs/opt_lib_use.$LINKER.ll
+mv build/branch_weights.ll outputs/pgo_use.$LINKER.ll
+mv build/branch_weights outputs/pgo_use.$LINKER
 
 #--------------------------------
 # Build non-pgo version
@@ -102,13 +112,13 @@ rustc $COMMON_ARGS \
       opt_lib.rs
 
 rustc $COMMON_ARGS \
-      --crate-name=non_pgo \
       branch_weights.rs
 
 mv build/opt_lib.ll outputs/opt_lib_non_pgo.$LINKER.ll
+mv build/branch_weights outputs/non_pgo.$LINKER
 
-perf stat ./build/non_pgo 2>&1 | tee outputs/non_pgo.$LINKER.stats
-perf stat ./build/pgo_use 2>&1 | tee outputs/pgo_use.$LINKER.stats
+perf stat ./outputs/pgo_use.$LINKER 2>&1 | tee outputs/non_pgo.$LINKER.stats
+perf stat ./outputs/non_pgo.$LINKER 2>&1 | tee outputs/pgo_use.$LINKER.stats
 
-hyperfine --warmup 5 ./build/non_pgo
-hyperfine --warmup 5 ./build/pgo_use
+hyperfine --warmup 5 ./outputs/non_pgo.$LINKER
+hyperfine --warmup 5 ./outputs/pgo_use.$LINKER

@@ -47,11 +47,10 @@ const RANDOM_NUMBERS: &[u8] = &[
     22,0,95,1,20,100,73,48,95,89,78
 ];
 
-fn main() -> std::io::Result<()> {
+fn main() {
 
     for _ in 0 .. 100_000 {
         opt_lib::do_the_loop(RANDOM_NUMBERS, RANDOM_NUMBERS.len());
     }
 
-    Ok(())
 }
