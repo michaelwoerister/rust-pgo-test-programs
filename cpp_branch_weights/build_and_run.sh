@@ -74,7 +74,7 @@ clang-8 -O3 -c -o ./build/opt_lib.o \
 ar rsc ./build/libopt_lib.a ./build/opt_lib.o
 
 clang-8 -O3 -fuse-ld=$LINKER \
-      -fprofile-generate=$CWD/profdata/merged.profdata \
+      -fprofile-use=$CWD/profdata/merged.profdata \
       -o ./build/pgo_use \
       branch_weights.c \
       -L ./build \
@@ -106,12 +106,10 @@ clang-8 -O3 -fuse-ld=$LINKER \
       -lopt_lib \
       -lopaque
 
-# mv build/opt_lib.ll outputs/opt_lib_non_pgo.ll
+perf stat ./build/non_pgo 2>&1 | tee outputs/non_pgo.stats
+perf stat ./build/pgo_use 2>&1 | tee outputs/pgo_use.stats
 
-# perf stat ./build/non_pgo 2>&1 | tee outputs/non_pgo.stats
-# perf stat ./build/pgo_use 2>&1 | tee outputs/pgo_use.stats
-
-# hyperfine --warmup 5 ./build/non_pgo
-# hyperfine --warmup 5 ./build/pgo_use
+hyperfine --warmup 5 ./build/non_pgo
+hyperfine --warmup 5 ./build/pgo_use
 
 objdump -h ./build/pgo_gen | rg __llvm_prf_data
