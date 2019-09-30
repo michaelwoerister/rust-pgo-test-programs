@@ -11,8 +11,6 @@ mkdir -p ./profdata
 mkdir -p ./build
 mkdir -p ./outputs
 
-rustup override set 0-rust-2
-
 #--------------------------------
 # Build the instrumented binary
 #--------------------------------
